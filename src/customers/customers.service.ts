@@ -35,4 +35,12 @@ export class CustomersService {
     Object.assign(customer, dto);
     return this.customerRepository.save(customer);
   }
+
+  async delete(id: number): Promise<void> {
+    const result = await this.customerRepository.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Customer with ID: ${id} not found`);
+    }
+  }
 }
