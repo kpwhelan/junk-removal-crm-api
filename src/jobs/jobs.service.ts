@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from './entities/job.entity';
-import { Repository } from 'typeorm/browser/repository/Repository.js';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
+import { FindJobsQueryDto } from './dto/find-jobs-query.dto';
+import { FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
 export class JobsService {
@@ -11,8 +12,27 @@ export class JobsService {
     @InjectRepository(Job) private readonly jobRepository: Repository<Job>,
   ) {}
 
-  async findAll(): Promise<Job[]> {
-    return this.jobRepository.find();
+  async findAll(query?: FindJobsQueryDto): Promise<Job[]> {
+    const where: FindOptionsWhere<Job> = {};
+
+    if (query?.status) {
+      where.status = query.status;
+    }
+
+    if (query?.city) {
+      where.city = query.city;
+    }
+
+    if (query?.customerId) {
+      where.customerId = Number(query.customerId);
+    }
+
+    return this.jobRepository.find({
+      where,
+      order: {
+        createdAt: 'DESC',
+      },
+    });
   }
 
   async findOneById(id: number): Promise<Job | null> {

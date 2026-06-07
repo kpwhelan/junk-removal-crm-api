@@ -7,11 +7,13 @@ import {
   Body,
   Patch,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { Job } from './entities/job.entity';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
+import { FindJobsQueryDto } from './dto/find-jobs-query.dto';
 
 @Controller('jobs')
 export class JobsController {
@@ -20,6 +22,11 @@ export class JobsController {
   @Get()
   index(): Promise<Job[]> {
     return this.jobsService.findAll();
+  }
+
+  @Get()
+  findAll(@Query() query: FindJobsQueryDto): Promise<Job[]> {
+    return this.jobsService.findAll(query);
   }
 
   @Get(':id')
