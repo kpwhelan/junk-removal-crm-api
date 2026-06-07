@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   ParseIntPipe,
 } from '@nestjs/common';
@@ -22,6 +23,14 @@ export class CustomersController {
   @Get(':id')
   show(@Param('id', ParseIntPipe) id: number): Promise<Customer | null> {
     return this.customersService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateCustomerDto: Partial<CreateCustomerDto>,
+  ): Promise<Customer> {
+    return this.customersService.update(id, updateCustomerDto);
   }
 
   @Post()
