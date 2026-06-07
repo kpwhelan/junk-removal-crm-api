@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { CustomersService } from './customers.service';
 import { Customer } from './entities/customer.entity';
@@ -10,6 +17,11 @@ export class CustomersController {
   @Get()
   index(): Promise<Customer[]> {
     return this.customersService.findAll();
+  }
+
+  @Get(':id')
+  show(@Param('id', ParseIntPipe) id: number): Promise<Customer | null> {
+    return this.customersService.findOne(id);
   }
 
   @Post()

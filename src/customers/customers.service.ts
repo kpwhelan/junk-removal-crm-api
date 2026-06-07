@@ -15,6 +15,10 @@ export class CustomersService {
     return this.customerRepository.find();
   }
 
+  async findOne(id: number): Promise<Customer | null> {
+    return this.customerRepository.findOneBy({ id });
+  }
+
   async create(dto: CreateCustomerDto): Promise<Customer> {
     const customer = this.customerRepository.create(dto);
     return this.customerRepository.save(customer);
