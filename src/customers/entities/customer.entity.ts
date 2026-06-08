@@ -1,7 +1,9 @@
+import { Job } from 'src/jobs/entities/job.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -40,6 +42,9 @@ export class Customer {
 
   @Column({ default: true })
   isActive!: boolean;
+
+  @OneToMany(() => Job, (job) => job.customer)
+  jobs!: Job[];
 
   @CreateDateColumn()
   createdAt!: Date;

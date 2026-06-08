@@ -11,10 +11,20 @@ import {
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { CustomersService } from './customers.service';
 import { Customer } from './entities/customer.entity';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { JobsService } from 'src/jobs/jobs.service';
 
 @Controller('customers')
 export class CustomersController {
-  constructor(private readonly customersService: CustomersService) {}
+  constructor(
+    private readonly customersService: CustomersService,
+    private readonly jobsService: JobsService,
+  ) {}
+
+  @Get(':id/jobs')
+  findJobs(@Param('id', ParseIntPipe) id: number) {
+    return this.jobsService.findByCustomerId(id);
+  }
 
   @Get()
   index(): Promise<Customer[]> {
@@ -29,7 +39,7 @@ export class CustomersController {
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateCustomerDto: Partial<CreateCustomerDto>,
+    @Body() updateCustomerDto: UpdateCustomerDto,
   ): Promise<Customer> {
     return this.customersService.update(id, updateCustomerDto);
   }
