@@ -22,7 +22,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  show(@Param('id', ParseIntPipe) id: number): Promise<User | null> {
+  show(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.usersService.findOneById(id);
   }
 

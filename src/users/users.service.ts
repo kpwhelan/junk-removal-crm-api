@@ -17,9 +17,7 @@ export class UsersService {
   ) {}
 
   async findAll(): Promise<User[]> {
-    const users = await this.userRepository.find();
-    console.log(users);
-    return users;
+    return this.userRepository.find();
   }
 
   async findOneById(id: number): Promise<User> {
@@ -41,32 +39,38 @@ export class UsersService {
   }
 
   async create(dto: CreateUserDto): Promise<User> {
-    const existingUser = await this.userRepository.findOneBy({
-      email: dto.email,
-    });
+    const email = dto.email.toLowerCase();
+
+    const existingUser = await this.userRepository.findOneBy({ email });
 
     if (existingUser) {
-      throw new ConflictException(
-        `User with email: ${dto.email} already exists`,
-      );
+      throw new ConflictException(`User with email: ${email} already exists`);
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const user = this.userRepository.create({
       ...dto,
+      email,
       password: hashedPassword,
-      email: dto.email.toLowerCase(),
     });
 
     return this.userRepository.save(user);
   }
 
   async update(id: number, dto: UpdateUserDto): Promise<User> {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.findOneById(id);
 
-    if (!user) {
-      throw new NotFoundException(`User with ID: ${id} not found`);
+    if (dto.email) {
+      const email = dto.email.toLowerCase();
+
+      const existingUser = await this.userRepository.findOneBy({ email });
+
+      if (existingUser && existingUser.id !== id) {
+        throw new ConflictException(`User with email: ${email} already exists`);
+      }
+
+      dto.email = email;
     }
 
     if (dto.password) {
@@ -74,6 +78,7 @@ export class UsersService {
     }
 
     Object.assign(user, dto);
+
     return this.userRepository.save(user);
   }
 }
