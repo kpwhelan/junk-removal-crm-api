@@ -36,6 +36,10 @@ export class User {
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
 
+  @Exclude()
+  @Column({ nullable: true, type: 'text' })
+  refreshToken?: string | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 

@@ -81,4 +81,17 @@ export class UsersService {
 
     return this.userRepository.save(user);
   }
+
+  async updateRefreshTokenHash(
+    userId: number,
+    refreshToken: string | null,
+  ): Promise<void> {
+    const refreshTokenHash = refreshToken
+      ? await bcrypt.hash(refreshToken, 10)
+      : null;
+
+    await this.userRepository.update(userId, {
+      refreshToken: refreshTokenHash,
+    });
+  }
 }
