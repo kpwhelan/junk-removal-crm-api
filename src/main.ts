@@ -6,6 +6,11 @@ import { ClassSerializerInterceptor } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  });
+
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(app.get('Reflector')),
   );
