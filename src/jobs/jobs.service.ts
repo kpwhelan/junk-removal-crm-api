@@ -1,15 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from './entities/job.entity';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
 import { FindJobsQueryDto } from './dto/find-jobs-query.dto';
 import { FindOptionsWhere, Repository } from 'typeorm';
+import { Customer } from 'src/customers/entities/customer.entity';
 
 @Injectable()
 export class JobsService {
   constructor(
     @InjectRepository(Job) private readonly jobRepository: Repository<Job>,
+    @InjectRepository(Customer)
+    private readonly customerRepository: Repository<Customer>,
   ) {}
 
   async findAll(query?: FindJobsQueryDto): Promise<Job[]> {
@@ -40,7 +47,47 @@ export class JobsService {
   }
 
   async create(dto: CreateJobDto): Promise<Job> {
-    const job = this.jobRepository.create(dto);
+    const hasExistingCustomer =
+      dto.customerId !== undefined && dto.customerId !== null;
+
+    const hasNewCustomer = dto.customer !== undefined && dto.customer !== null;
+
+    if (!hasExistingCustomer && !hasNewCustomer) {
+      throw new BadRequestException(
+        'Either customerId or customer is required.',
+      );
+    }
+
+    if (hasExistingCustomer && hasNewCustomer) {
+      throw new BadRequestException(
+        'Provide either customerId or customer, not both.',
+      );
+    }
+
+    let customer: Customer | null = null;
+
+    if (hasExistingCustomer) {
+      customer = await this.customerRepository.findOneBy({
+        id: dto.customerId!,
+      });
+    } else {
+      customer = this.customerRepository.create(dto.customer!);
+      customer = await this.customerRepository.save(customer);
+    }
+
+    if (!customer) {
+      throw new NotFoundException(
+        `Customer with ID: ${dto.customerId} not found`,
+      );
+    }
+
+    const { customerId: _customerId, customer: _customer, ...jobData } = dto;
+
+    const job = this.jobRepository.create({
+      ...jobData,
+      customerId: customer.id,
+    });
+
     return this.jobRepository.save(job);
   }
 

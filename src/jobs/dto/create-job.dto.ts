@@ -4,12 +4,21 @@ import {
   IsString,
   IsEnum,
   IsDateString,
+  ValidateNested,
 } from 'class-validator';
 import { JobStatus } from '../enums/job-status.enum';
+import { Type } from 'class-transformer';
+import { CreateCustomerDto } from 'src/customers/dto/create-customer.dto';
 
 export class CreateJobDto {
+  @IsOptional()
   @IsNumber()
-  customerId!: number;
+  customerId?: number;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CreateCustomerDto)
+  customer?: CreateCustomerDto;
 
   @IsString()
   title!: string;

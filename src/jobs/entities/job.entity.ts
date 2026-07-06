@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { JobStatus } from '../enums/job-status.enum';
-import { ManyToOne } from 'typeorm/browser';
+import { ManyToOne } from 'typeorm';
 import { Customer } from 'src/customers/entities/customer.entity';
 
 @Entity()
@@ -31,7 +31,7 @@ export class Job {
   @Column({
     type: 'enum',
     enum: JobStatus,
-    default: JobStatus.LEAD,
+    default: JobStatus.SCHEDULED,
   })
   status!: JobStatus;
 
