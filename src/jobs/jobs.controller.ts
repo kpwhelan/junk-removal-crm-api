@@ -36,7 +36,6 @@ export class JobsController {
 
   @Post()
   create(@Body() createJobDto: CreateJobDto): Promise<Job> {
-    console.log(createJobDto);
     return this.jobsService.create(createJobDto);
   }
 
